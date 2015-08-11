@@ -15,6 +15,9 @@
  * @tparam Integral		An integral type supporting the usual operations (assignment, shifts, bitwise and/or)
  */
 
+#include <iostream>
+#include <stdexcept>
+
 template<typename Integral>class BitPacker {
 public:
 	static constexpr bool is_packer=true;
@@ -31,7 +34,7 @@ public:
 			std::cerr << "WARNING: Unused bits in BitPacker (filled " << bits_-remaining_ << '/' << bits_ << ")" << std::endl;
 	}
 
-	template<typename T>void append(size_t N,const T& x)
+	template<typename T>void append(std::size_t N,const T& x)
 	{
 		if (N > remaining_)
 			throw std::out_of_range("BitPacker::append");
