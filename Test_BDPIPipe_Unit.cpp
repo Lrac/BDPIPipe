@@ -116,7 +116,11 @@ BOOST_AUTO_TEST_CASE( inp128 )
 
 	FixedInt<boost::multiprecision::number<boost::multiprecision::gmp_int>,76> rest;
 
-	oa & expect_ff & expect_eedd & expect_c & expect_c2 & Pad<20>() & rest;
+	std::tuple<FixedInt<unsigned,4>,FixedInt<unsigned,4>> pc;
+	expect_c = get<0>(pc);
+	expect_c2 = get<1>(pc);
+
+	oa & expect_ff & expect_eedd & pc & Pad<20>() & rest;
 
 	BOOST_CHECK_EQUAL(rest.value(), 0);
 	BOOST_CHECK_EQUAL(expect_ff, 0xff);

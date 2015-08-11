@@ -9,3 +9,6 @@ model_*.cxx
 *.out
 test-*
 imported_BDPI_functions.h
+vpi_wrapper_*.[ch]
+*_register.c
+mk*.v
