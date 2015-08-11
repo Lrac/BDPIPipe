@@ -27,8 +27,6 @@
 class BDPIAutoArrayBitPacker : public BitPacker<boost::multiprecision::number<boost::multiprecision::gmp_int>>
 {
 public:
-	//static constexpr bool is_packer=true;
-
 	BDPIAutoArrayBitPacker(unsigned bits,uint32_t* p) :
 		BitPacker<boost::multiprecision::number<boost::multiprecision::gmp_int>>(bits,zeroBits_(bits)),			// pre-allocate the necessary bits
 		p_(p) {}
