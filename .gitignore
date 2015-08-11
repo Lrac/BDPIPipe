@@ -1,0 +1,11 @@
+*.so
+*.b[ao]
+model_*.[ch]
+*.dSYM
+work
+mk*.cxx
+mk*.h
+model_*.cxx
+*.out
+test-*
+imported_BDPI_functions.h
