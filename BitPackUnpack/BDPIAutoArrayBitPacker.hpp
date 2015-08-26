@@ -27,9 +27,11 @@
 class BDPIAutoArrayBitPacker : public BitPacker<boost::multiprecision::number<boost::multiprecision::gmp_int>>
 {
 public:
+	using BitPacker<boost::multiprecision::number<boost::multiprecision::gmp_int>>::is_packer;
+
 	BDPIAutoArrayBitPacker(unsigned bits,uint32_t* p) :
 		BitPacker<boost::multiprecision::number<boost::multiprecision::gmp_int>>(bits,zeroBits_(bits)),			// pre-allocate the necessary bits
-		p_(p) {}
+		p_((mp_limb_t*)p) {}
 
 	~BDPIAutoArrayBitPacker()
 	{
@@ -41,7 +43,8 @@ public:
 			int Nl = (bits()+(sizeof(mp_limb_t)<<3)-1)/(sizeof(mp_limb_t)<<3);
 			assert(t[0]->_mp_alloc == Nl);
 			assert(t[0]->_mp_d);
-			std::copy(t[0]->_mp_d,t[0]->_mp_d+Nl,p_);
+
+			std::copy((mp_limb_t*)t[0]->_mp_d,(mp_limb_t*)t[0]->_mp_d+Nl,p_);
 		}
 	}
 
@@ -53,7 +56,7 @@ private:
 		mpz_init2(i,bits);
 		return i;
 	}
-	uint32_t* p_=nullptr;
+	mp_limb_t* p_=nullptr;
 };
 
 

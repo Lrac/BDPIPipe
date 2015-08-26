@@ -13,6 +13,8 @@
 #include <exception>
 #include <stdexcept>
 
+#include <limits>
+
 /**
  * @tparam ReadableBitVector
  *
@@ -35,37 +37,33 @@ template<class Output,class BitVector>Output bitslice(const BitVector& v,unsigne
 		throw std::logic_error("bitslice: direction incorrect");
 
 	std::size_t Nb=from-downto+1;
-//	std::size_t No=BDPIBitVectorTraits<T>::maxBits_;
+	std::size_t Nbo = 8*sizeof(Output);
 
-//	if (Nb > No)
-//		throw std::logic_error("bitslice: recipient type of insufficient size");
-
-	// NOT TESTED YET
-////
-////		if (std::numeric_limits<T>::is_signed)
-////		{
-//			// Need to handle sign-extension properly; shift so left edge of range is at MSB of output var, then shift right
-//			// because T is signed, right-shift will do sign extension
-//			T o = static_cast<T>(
-//				from >= BDPIBitVectorTraits<T>::maxBits_-1 ?
-//						((typename BDPIBitStorage<InputType>::Storage)(backend() >> T(from-No))) :
-//						((typename BDPIBitStorage<InputType>::Storage)(backend() << T(No-from-1)))
-//			);
-//
-//			return o >> (No-Nb);
-//		}
-//		else
+	if (Nb > Nbo)
+		throw std::logic_error("bitslice: recipient type of insufficient size");
 
 	BitVector tmp = v;
-	tmp >>= downto;
 
 	Output mask = 1;
-	mask <<= Nb;
+
+	if (Nb < Nbo)
+		mask <<= Nb;
+	else
+		mask = 0;
 	mask--;
 
-	// formulation below is required when working with GMP because it appears to saturate if tmp > maxvalue(Output)
+	tmp >>= downto;
 	tmp &= mask;
-	return static_cast<Output>(tmp);
+
+	Output o = static_cast<Output>(tmp);
+
+	if (std::numeric_limits<Output>::is_signed)
+	{
+		o <<= Nbo-Nb;
+		o >>= Nbo-Nb;
+	}
+
+	return o;
 }
 
 template<typename ReadableBitVector>class BitUnpacker {

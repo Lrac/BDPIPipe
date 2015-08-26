@@ -114,19 +114,79 @@ BOOST_AUTO_TEST_CASE( inp128 )
 	FixedInt<unsigned,16> expect_eedd;
 	FixedInt<unsigned,4> expect_c, expect_c2;
 
-	FixedInt<boost::multiprecision::number<boost::multiprecision::gmp_int>,76> rest;
+	//FixedInt<boost::multiprecision::number<boost::multiprecision::gmp_int>,76> rest;
 
 	std::tuple<FixedInt<unsigned,4>,FixedInt<unsigned,4>> pc;
-	expect_c = get<0>(pc);
-	expect_c2 = get<1>(pc);
 
-	oa & expect_ff & expect_eedd & pc & Pad<20>() & rest;
+	oa & expect_ff & expect_eedd & pc & Pad<20>();// & rest;
 
-	BOOST_CHECK_EQUAL(rest.value(), 0);
-	BOOST_CHECK_EQUAL(expect_ff, 0xff);
-	BOOST_CHECK_EQUAL(expect_eedd,0xeedd);
-	BOOST_CHECK_EQUAL(expect_c,0xc);
-	BOOST_CHECK_EQUAL(expect_c2,0xc);
+	//BOOST_CHECK_EQUAL(rest.value(), 0);
+	BOOST_CHECK_EQUAL(expect_ff.value(), 0xff);
+	BOOST_CHECK_EQUAL(expect_eedd.value(),0xeedd);
+	BOOST_CHECK_EQUAL(get<0>(pc).value(),0xc);
+	BOOST_CHECK_EQUAL(get<1>(pc).value(),0xc);
 }
+
+#include "FixedInt.hpp"
+#include "FixedPoint.hpp"
+
+#include "BitPackUnpack/BDPIAutoArrayBitPacker.hpp"
+#include "BitPackUnpack/ConstGMPArray.hpp"
+
+#include "BitPackUnpack/Types/std_bool.hpp"
+#include "BitPackUnpack/Types/std_array.hpp"
+#include "BitPackUnpack/Types/std_pair.hpp"
+#include "BitPackUnpack/Types/std_tuple.hpp"
+#include "BitPackUnpack/Types/Pad.hpp"
+
+BOOST_AUTO_TEST_CASE( packunpack )
+{
+	const unsigned N=110;
+	mp_limb_t dst[(N+sizeof(mp_limb_t)*8-1)/sizeof(mp_limb_t)];
+
+	BOOST_CHECK_EQUAL(sizeof(mp_limb_t),8);
+
+	{
+		BDPIAutoArrayBitPacker P(N,(uint32_t*)dst);
+
+		std::tuple<FixedInt<unsigned,4>,bool,bool,FixedPoint<signed,3,4>> 	t{4,true,false,-2.7};		// 13b
+		std::pair<FixedInt<signed,3>,FixedInt<unsigned,3>> 					p{-2,7};					// 6b
+		std::array<FixedInt<unsigned,4>,4>									a{0,1,2,15};				// 16b
+
+		FixedInt<unsigned long long,64>										i=0xdeadbeefbaadc0deULL; 	// 64b
+
+		P & t & p & a & Pad<11>() & i;
+	}
+
+	ConstGMPArray A(N,(const uint32_t*)dst);
+
+	cout << std::dec;
+
+	BitUnpacker<ConstGMPArray>	U(N,(const uint32_t*)dst);
+
+	std::tuple<FixedInt<unsigned,4>,bool,bool,FixedPoint<signed,3,4>> 		t;			// 13b
+	std::pair<FixedInt<signed,3>,FixedInt<unsigned,3>> 						p;			// 6b
+	std::array<FixedInt<unsigned,4>,4>										a;			// 16b
+
+	FixedInt<unsigned long long,64>											i; 			// 64b
+
+	U & t & p & a & Pad<11>() & i;
+
+	BOOST_CHECK_EQUAL(get<0>(t).value(),4);
+	BOOST_CHECK_EQUAL(get<1>(t),true);
+	BOOST_CHECK_EQUAL(get<2>(t),false);
+	BOOST_CHECK(get<3>(t).equals(-2.7));
+
+	BOOST_CHECK_EQUAL(p.first.value(),-2);
+	BOOST_CHECK_EQUAL(p.second.value(),7);
+
+	BOOST_CHECK_EQUAL(a[0].value(),0);
+	BOOST_CHECK_EQUAL(a[1].value(),1);
+	BOOST_CHECK_EQUAL(a[2].value(),2);
+	BOOST_CHECK_EQUAL(a[3].value(),15);
+
+	BOOST_CHECK_EQUAL(i.value(),0xdeadbeefbaadc0deULL);
+}
+
 
 

@@ -25,23 +25,25 @@ template<typename T,std::size_t N>class FixedInt;
 template<typename T,std::size_t N>class FixedInt
 {
 public:
-	FixedInt(T i=T()) : value_(i){}
+	explicit FixedInt(T i=T()) : value_(i){}
 
-	operator T() const { return value_; }
+	explicit operator T() const { return value_; }
+	T value() const { return value_; }
 
 	unsigned hexdigits() const { return (N+3)>>2; }
 	unsigned bits() const { return N; }
 
-	T value() const { return value_; }
-
 private:
 	T value_;
+
+	static constexpr T mask(){ return (T(1) << (unsigned long long)bits)-T(1); }
+	static constexpr T msb(){  return T(1) << (bits-1); }
 };
 
 
 template<typename T,std::size_t N>std::ostream& operator<<(std::ostream& os,const FixedInt<T,N> i)
 {
-	return os << std::hex << std::setw(i.hexdigits()) << std::setfill('0') << std::uppercase << T(i);
+	return os << std::hex << std::setw(i.hexdigits()) << std::setfill('0') << std::uppercase << i.value();
 }
 
 template<typename T,std::size_t N>std::istream& operator>>(std::istream& is,FixedInt<T,N>& i)

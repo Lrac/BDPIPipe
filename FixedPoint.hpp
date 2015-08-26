@@ -24,18 +24,22 @@
 #include "FixedInt.hpp"
 
 template<typename T,int I,int F>struct FixedPoint : public FixedInt<T,I+F> {
-	static constexpr unsigned long long mask = (1ULL << (unsigned long long)bits)-1ULL;
-	static constexpr unsigned long long msb = 1ULL << (bits-1);
+public:
+	using FixedInt<T,I+F>::value;
 
-	static constexpr double k = ldexp(1.0,-F);
+	FixedPoint() : FixedInt<T,I+F>(0){}
 
-	FixedPoint() : x(0){}
+	FixedPoint(float f)	: FixedInt<T,I+F>(T(f*recip_k)) {}
+	FixedPoint(double d): FixedInt<T,I+F>(T(d*recip_k)) {}
 
-	FixedPoint(float f)	{ x = (long long)(f/k); }
-	FixedPoint(double d){ x = (long long)(d/k); }
+	explicit operator float()  const { return k*float(value());  }
+	explicit operator double() const { return k*double(value()); }
 
-	explicit operator float()  const { return k*float(x);  }
-	explicit operator double() const { return k*double(x); }
+	bool equals(double x) const { return FixedPoint<T,I,F>(x).value() == value(); }
+
+private:
+	static constexpr double k 		= ldexp(1.0,-F);
+	static constexpr double recip_k = ldexp(1.0,F);
 };
 
 

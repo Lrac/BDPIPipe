@@ -37,7 +37,8 @@ public:
 			mpz_init(*t);
 	}
 
-	// release the storage; we do not actually own the memory so should not deallocate it (Boost destructor will automatically)
+	// release the storage; we do not actually own the memory so should not deallocate it
+	// (Boost destructor will do so automatically, causing nastiness)
 	~ConstGMPArray()
 	{
 		x_.backend().data()->_mp_alloc=x_.backend().data()->_mp_size=0;

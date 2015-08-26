@@ -20,7 +20,7 @@ Test_BDPIPipe_Unit: Test_BDPIPipe_Unit.o
 %.o: Streams/%.cpp *.hpp
 	$(CXX) $(CXX_OPTS) -c $<
 	
-%.o: %.cpp *.hpp
+%.o: %.cpp *.hpp BitPackUnpack/*.hpp BitPackUnpack/Types/*.hpp
 	$(CXX) $(CXX_OPTS) -c $<
 
 %_32.o: Streams/%.cpp *.hpp
