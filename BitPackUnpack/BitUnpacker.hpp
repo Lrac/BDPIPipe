@@ -89,7 +89,7 @@ public:
 		if (N > remaining_)
 			throw std::out_of_range("BitUnpacker::extract requested more bits than are remaining");
 
-		T o = bitslice<T>(x_,remaining_-1,remaining_-N);
+		T o = bitslice<T>(x_,bits_-remaining_+N-1,bits_-remaining_);
 		remaining_ -= N;
 
 		return o;

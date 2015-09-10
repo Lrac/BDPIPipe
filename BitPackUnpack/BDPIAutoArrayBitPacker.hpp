@@ -43,8 +43,7 @@ public:
 			int Nl = (bits()+(sizeof(mp_limb_t)<<3)-1)/(sizeof(mp_limb_t)<<3);
 			assert(t[0]->_mp_alloc == Nl);
 			assert(t[0]->_mp_d);
-
-			std::copy((mp_limb_t*)t[0]->_mp_d,(mp_limb_t*)t[0]->_mp_d+Nl,p_);
+			std::reverse_copy((mp_limb_t*)t[0]->_mp_d,(mp_limb_t*)t[0]->_mp_d+Nl,p_);
 		}
 	}
 
